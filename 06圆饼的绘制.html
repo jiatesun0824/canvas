@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <canvas id="can"></canvas>
+</body>
+
+</html>
+<script>
+  var can = document.querySelector('#can')
+  can.width = '600'
+  can.height = '600'
+  var context = can.getContext('2d');
+  var data = [{
+      name: '周杰伦',
+      age: 10
+    }, {
+      name: '林俊杰',
+      age: 32
+    },
+    {
+      name: '谢霆锋',
+      age: 18
+    },
+    {
+      name: '胡歌',
+      age: 25
+    },
+    {
+      name: '周星驰',
+      age: 13
+    }
+  ]
+  var color = ['hotpink', 'green', 'red', 'yellow', 'yellowgreen']
+  //  先计算data里面总的age
+  var sum = 0;
+  data.forEach(function (value, index) {
+    sum += value.age;
+  })
+  // 在计算每个单位年龄占了多少弧度
+  var total = 2 * Math.PI / sum;
+  //  再通过单位弧度修改data中的age值返回到一个新的数组
+  var dataReturn = data.map(function (value, index) {
+    return {
+      name: value.name,
+      age: value.age * total
+    }
+  })
+  // 遍历返回的这个数组，计算扇形的起始弧度和结束弧度，push到一个新数组中，方便遍历
+  var arr = [];
+  dataReturn.forEach(function (value, index) {
+    arr.push({
+      start: index == 0 ? 0 : arr[index - 1].end,
+      end: index == 0 ? value.age : arr[index - 1].end + value.age,
+      deg: index == 0 ? value.age / 2 : arr[index - 1].end + value.age / 2
+    })
+  })
+  console.log(arr)
+  // 遍历push出来放了弧度的数组，进行画图
+  arr.forEach(function (value, index) {
+    // 声明两个文字点
+    var textX = 200 + 120 * Math.cos(value.deg);
+    var textY = 200 + 120 * Math.sin(value.deg);
+    console.log(textX, textY)
+    // 绘制圆饼
+    context.beginPath();
+    context.moveTo(200, 200);
+    context.fillStyle = color[index];
+    context.arc(200, 200, 100, value.start, value.end)
+    context.fill();
+    // 绘制线条
+    context.beginPath();
+    context.moveTo(200, 200);
+    context.lineTo(textX, textY);
+    context.stroke();
+    //  绘制文字
+    context.beginPath();
+    console.log(textWidth)
+    context.font = '20px 微软雅黑'
+    var textWidth = context.measureText(dataReturn[index].name).width; //这里返回的是一个队对象，要加width
+    context.textBaseline = 'bottom'
+    if (value.deg > Math.PI / 2 && value.deg < Math.PI / 2 * 3) {
+      context.textAlign = 'right';
+      textWidth = -textWidth;
+    } else {
+      context.textAlign = 'left';
+    }
+    context.fillStyle = color[index];
+    context.fillText(dataReturn[index].name, textX, textY)
+    // 绘制文字底线
+    context.beginPath();
+    context.moveTo(textX, textY)
+    context.lineTo(textX + textWidth, textY);
+    context.stroke();
+
+  })
+</script>

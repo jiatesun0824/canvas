@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <canvas id="can"></canvas>
+</body>
+
+</html>
+
+<script>
+  var can = document.querySelector('#can');
+  can.width = '600';
+  can.height = '600';
+  var context = can.getContext('2d');
+  var deg = 0;
+  var timer = setInterval(function () {
+    context.save();//保存
+    context.clearRect(0,0,can.width,can.height)//不需要再往负数去清除，因为每一次我都拿到了出事的设置状态
+    context.translate(150, 150)
+    context.rotate(deg=deg+Math.PI/90);//这里可以放一个表达式
+    context.strokeRect(-50, -50, 100, 100);
+    context.restore();//回滚
+  }, 1000/30)
+</script>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <canvas id="can"></canvas>
+</body>
+
+</html>
+<script src="js/util.js"></script>
+<script src="js/bird.js"></script>
+<script src="js/land.js"></script>
+<script src="js/sky.js"></script>
+<script src="js/timer.js"></script>
+<script>
+  var can = document.querySelector('#can');
+  // 这里先不设置画布的宽高，我们在下面根据背景图的大小动态设置
+  var context = can.getContext('2d')
+  // 图片都加载完再执行主函数
+  util({
+    bird: 'images/bird.png',
+    land: 'images/land.png',
+    pipeDown: 'images/pipeDown.png',
+    pipeUp: 'images/pipeUp.png',
+    sky: 'images/sky.png'
+  }, function (imgObj) {
+    main(imgObj);
+  })
+  // 游戏主函数
+  function main(imgObj) {
+    can.width = imgObj.sky.width; //在util函数里，我们是把图片函数存在了这个对象的键里面
+    can.height = imgObj.sky.height;
+    // 批量创建背景对象
+    // 声明一个数组来存放批量创建出来的对象
+    var zhuArr = []
+    // 计算图片的张数
+    var skyTotal = Math.ceil(can.width / imgObj.sky.width) + 1;
+    for (i = 0; i < skyTotal; i++) {
+      zhuArr.push(new sky({
+        context: context,
+        img: imgObj.sky,
+        x: imgObj.sky.width * i //图片的宽度乘以i
+        // y默认是0，不用传
+      }))
+    }
+    // 计算图片的张数      
+    var landTotal = Math.ceil(can.width / imgObj.land.width) + 1;
+    for (i = 0; i < landTotal; i++) {
+      zhuArr.push(new land({
+        context: context,
+        img: imgObj.land,
+        x: imgObj.land.width * i, //图片的宽度乘以i
+        y: can.height - imgObj.land.height
+      }))
+    }
+    // 小鸟只有一张，不用计算张数；
+    zhuArr.push(new bird({
+      context: context,
+      img: imgObj.bird,
+      w: (imgObj.bird.width) / 3,
+      h: imgObj.bird.height
+    }))
+    console.log(zhuArr)
+    // 创建时间对象
+    zhuArr.push(new timer({
+      context:context
+    }))
+    // 开启动画
+    setInterval(function () {
+      context.clearRect(0, 0, can.width, can.height);
+      // 遍历zhuArr，调用绘图函数和动态改变函数
+      zhuArr.forEach(function (value, index) {
+        value.draw();
+        value.update();
+      })
+
+
+    }, 1000 / 30)
+
+  }
+</script>
